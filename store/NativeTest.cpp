@@ -1,0 +1,8 @@
+#define UNICODE
+#include <windows.h>
+#include <shobjidl.h>
+#include <thumbcache.h>
+#include <shlwapi.h>
+#include <cstdio>
+const GUID ThumbIID={0xe357fccd,0xa995,0x4576,{0xb0,0x1f,0x23,0x46,0x30,0x15,0x4e,0x96}};
+int wmain(int argc,wchar_t** argv){if(argc<4)return 2;CoInitializeEx(nullptr,COINIT_APARTMENTTHREADED);HMODULE dll=LoadLibraryW(argv[1]);if(!dll){printf("Load failed %lu\n",GetLastError());return 3;}auto get=(HRESULT(WINAPI*)(REFCLSID,REFIID,void**))GetProcAddress(dll,"DllGetClassObject");if(!get)return 4;int format=_wtoi(argv[2]);GUID id={0xd3d51000,0x17a0,0x4d18,{0xba,0x10,0,0,0,0,0,(BYTE)format}};IClassFactory* factory=nullptr;HRESULT hr=get(id,IID_IClassFactory,(void**)&factory);if(FAILED(hr))return 5;IInitializeWithStream* init=nullptr;hr=factory->CreateInstance(nullptr,IID_IInitializeWithStream,(void**)&init);factory->Release();if(FAILED(hr))return 6;IStream* stream=nullptr;hr=SHCreateStreamOnFileEx(argv[3],STGM_READ|STGM_SHARE_DENY_WRITE,0,FALSE,nullptr,&stream);if(FAILED(hr))return 7;hr=init->Initialize(stream,STGM_READ);stream->Release();if(FAILED(hr))return 8;IThumbnailProvider* provider=nullptr;hr=init->QueryInterface(ThumbIID,(void**)&provider);init->Release();if(FAILED(hr))return 9;HBITMAP bitmap=nullptr;WTS_ALPHATYPE alpha;hr=provider->GetThumbnail(256,&bitmap,&alpha);provider->Release();if(FAILED(hr)){printf("Render failed %08lx\n",hr);return 10;}BITMAP info={};GetObjectW(bitmap,sizeof(info),&info);printf("PASS native isolated worker: %ld x %ld\n",info.bmWidth,info.bmHeight);DeleteObject(bitmap);FreeLibrary(dll);CoUninitialize();return 0;}
