@@ -19,7 +19,9 @@ if not re.fullmatch(r'\d+\.\d+\.\d+', version):
 if subprocess.check_output(['git', 'status', '--porcelain'], cwd=root, text=True).strip():
     raise RuntimeError('Commit all source changes before publishing')
 commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=root, text=True).strip()
-remote = subprocess.check_output(['git', 'ls-remote', 'origin', 'refs/heads/main'], cwd=root, text=True).split()[0]
+ref_request = urllib.request.Request('https://api.github.com/repos/Wastrix-ba2ia/3DSTL/git/ref/heads/main', headers={'User-Agent': '3DSTL-release'})
+with urllib.request.urlopen(ref_request, timeout=30) as response:
+    remote = json.load(response)['object']['sha']
 if remote != commit:
     raise RuntimeError('Push this exact source commit to origin/main first')
 name = f'3DSTL-{version}-win-x64.zip'
