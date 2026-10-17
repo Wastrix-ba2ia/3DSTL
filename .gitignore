@@ -1,0 +1,10 @@
+artifacts/
+runtime/
+**/bin/
+**/obj/
+__pycache__/
+*.user
+*.zip
+*.exe
+*.dll
+*.pdb

@@ -1,0 +1,21 @@
+﻿第三方许可与支持说明
+本项目原创源代码采用 MIT 许可。第三方组件保留各自许可证。
+.NET 8：MIT 等；Python：PSF；trimesh：MIT；NumPy：BSD-3-Clause；OCP：Apache-2.0；Open CASCADE：LGPL-2.1 with Open CASCADE exception；VTK：BSD-3-Clause；Pillow：MIT-CMU/HPND；olefile：BSD-2-Clause。
+依赖许可证全文位于 cad-runtime/Lib/site-packages 相应包和 *.dist-info 目录。
+公开发布时必须保留依赖版权和许可证，并履行适用的源码及再链接义务。第三方二进制不能重新标为 MIT。
+
+STL/3MF/OBJ/PLY/OFF/AMF/STEP/STP 支持模型渲染。
+GCODE/GCO 支持内置PNG/JPEG和普通G0/G1挤出路径，特殊弧线及BGCODE尚未完整支持。
+SOLIDWORKS / eDrawings 仅尝试提取文件内置预览图；无预览、加密或不兼容版本无法显示。不解析专有实体几何，不启动SOLIDWORKS。
+输入上限128MiB，网格150万面，转换最长25秒；复杂文件可能无法生成。
+全部本地处理，不修改模型文件及默认打开程序。
+卸载缩略图功能恢复原关联，保留程序、模型和恢复备份。
+Third-party source and redistribution notes:
+Original project source is MIT (BA2IA). Dependencies retain their own licenses.
+Open CASCADE 7.8.x: https://github.com/Open-Cascade-SAS/OCCT/tree/V7_8_1 (LGPL-2.1 with Open CASCADE exception). Native shared libraries remain replaceable with compatible rebuilt libraries.
+OCP 7.8.1.1.post1: https://github.com/CadQuery/OCP
+VTK 9.3.1: https://github.com/Kitware/VTK/tree/v9.3.1
+Python 3.12.10: https://www.python.org/downloads/release/python-31210/
+.NET 8: https://github.com/dotnet/runtime and https://github.com/dotnet/wpf
+trimesh: https://github.com/mikedh/trimesh
+Full Python dependency license texts accompany the corresponding packages under cad-runtime/Lib/site-packages. Open CASCADE is not relicensed under MIT.
