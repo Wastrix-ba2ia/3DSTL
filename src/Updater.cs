@@ -53,13 +53,14 @@ class Updater : Form {
     if (UpdateClient.Hash(task.Zip) != task.Sha256.ToLowerInvariant()) throw new InvalidDataException("SHA256 verification failed");
     report("正在解压新版，原版保留 / Extracting new version…");
     string versions = Path.Combine(data,"Versions"); Directory.CreateDirectory(versions);
-    string staging = Path.Combine(versions,"staging-" + Guid.NewGuid().ToString("N"));
-    UpdateClient.Extract(task.Zip, staging, version);
-    var binaryVersion = FileVersionInfo.GetVersionInfo(Path.Combine(staging,"manager","3DSTL.dll"));
+    // Extract into an unreferenced version directory. Moving thousands of freshly
+    // scanned files can fail while antivirus holds a directory handle; activation
+    // still happens only after the complete payload and binary version validate.
+    installed = Path.Combine(versions,version + "-" + Guid.NewGuid().ToString("N").Substring(0,8));
+    UpdateClient.Extract(task.Zip, installed, version);
+    var binaryVersion = FileVersionInfo.GetVersionInfo(Path.Combine(installed,"manager","3DSTL.dll"));
     if (new Version(binaryVersion.FileMajorPart,binaryVersion.FileMinorPart,binaryVersion.FileBuildPart) != UpdateClient.ParseVersion(version))
      throw new InvalidDataException("Application binary version does not match release");
-    installed = Path.Combine(versions,version + "-" + Guid.NewGuid().ToString("N").Substring(0,8));
-    Directory.Move(staging,installed);
     report("正在等待管理器退出 / Waiting for the manager to close…");
     try {
      using var parent = Process.GetProcessById(task.ParentId);
@@ -99,10 +100,17 @@ class Updater : Form {
      link.TargetPath = manager; link.WorkingDirectory = installed; link.Save();
      shortcutHash = UpdateClient.Hash(shortcutPath);
     } finally { if(shortcut!=null)Marshal.ReleaseComObject(shortcut);if(shell!=null)Marshal.ReleaseComObject(shell); }
-    using(var app=Process.Start(new ProcessStartInfo(manager) { UseShellExecute = false, CreateNoWindow = true, WorkingDirectory = installed, ArgumentList = { "--updated" } })){
-     if(app.WaitForExit(1000)&&app.ExitCode!=0)throw new IOException("New manager could not start");
-     log.WriteLine("Installed " + installed + "; manager PID " + app.Id);
+    // Ask the desktop shell to launch the manager independently of the updater's
+    // process tree (important when a launcher owns a kill-on-close job object).
+    object desktop=null;
+    try{desktop=Activator.CreateInstance(Type.GetTypeFromProgID("Shell.Application"));((dynamic)desktop).ShellExecute(manager,"--updated",installed,"open",1);}
+    finally{if(desktop!=null)Marshal.ReleaseComObject(desktop);}
+    bool launched=false;
+    for(int attempt=0;attempt<20&&!launched;attempt++){
+     foreach(var app in Process.GetProcessesByName("3DSTL"))using(app){try{if(string.Equals(app.MainModule.FileName,manager,StringComparison.OrdinalIgnoreCase)){launched=true;log.WriteLine("Installed "+installed+"; manager PID "+app.Id);break;}}catch(InvalidOperationException){}}
+     if(!launched)Thread.Sleep(250);
     }
+    if(!launched)throw new IOException("New manager could not start");
    } catch (Exception e) {
     // Restore only entries still pointing at this attempted installation.
     foreach (var previous in oldServers) {
