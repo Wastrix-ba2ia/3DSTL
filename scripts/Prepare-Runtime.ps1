@@ -9,7 +9,7 @@ Invoke-WebRequest https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed
 Expand-Archive -LiteralPath $archive -DestinationPath $runtime -Force
 & $Python -m pip install --target (Join-Path $runtime 'Lib\site-packages') -r (Join-Path $root 'requirements-runtime.txt')
 if($LASTEXITCODE -ne 0){throw 'Dependency install failed'}
-[IO.File]::WriteAllText((Join-Path $runtime 'python312._pth'),"python312.zip`n.`nLib/site-packages`nimport site`n")
+[IO.File]::WriteAllText((Join-Path $runtime 'python312._pth'),"python312.zip`n.`n..`nLib/site-packages`nimport site`n")
 $pre=Join-Path $out 'prerequisites';New-Item -ItemType Directory -Path $pre -Force | Out-Null
 $installer=Join-Path $pre 'windowsdesktop-runtime-8.0.29-win-x64.exe'
 Invoke-WebRequest https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/8.0.29/windowsdesktop-runtime-8.0.29-win-x64.exe -OutFile $installer
