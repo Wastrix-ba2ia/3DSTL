@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.IO.Compression;
+using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
@@ -11,6 +13,10 @@ public static class LargeStl {
  public const uint Threshold = 1500000;
  const int PreviewFaces = 400000, Cells = 128;
  public static bool IsLarge(string path) {
+  if (Path.GetExtension(path).Equals(".3mf", StringComparison.OrdinalIgnoreCase)) {
+   using var archive = ZipFile.OpenRead(path);
+   return archive.Entries.Where(e => e.FullName.EndsWith(".model",StringComparison.OrdinalIgnoreCase)).Sum(e => e.Length) > 64L * 1024 * 1024;
+  }
   if (!Path.GetExtension(path).Equals(".stl", StringComparison.OrdinalIgnoreCase)) return false;
   using var file = File.OpenRead(path);
   if (file.Length < 84) return false;
@@ -38,7 +44,7 @@ public static class LargeStl {
  }
  public static MeshGeometry3D Read(BinaryReader reader, uint count) => Reduce(() => BinaryVertices(reader, count));
  public static MeshGeometry3D ReadText(string path) => Reduce(() => TextVertices(path));
- static MeshGeometry3D Reduce(Func<IEnumerable<Point3D>> scan) {
+ public static MeshGeometry3D Reduce(Func<IEnumerable<Point3D>> scan, int cells = Cells) {
   var min = new Point3D(double.PositiveInfinity, double.PositiveInfinity, double.PositiveInfinity);
   var max = new Point3D(double.NegativeInfinity, double.NegativeInfinity, double.NegativeInfinity);
   long vertexCount = 0;
@@ -48,7 +54,7 @@ public static class LargeStl {
    max.X = Math.Max(max.X, p.X); max.Y = Math.Max(max.Y, p.Y); max.Z = Math.Max(max.Z, p.Z);
    vertexCount++;
   }
-  double cell = Math.Max(max.X - min.X, Math.Max(max.Y - min.Y, max.Z - min.Z)) / Cells;
+  double cell = Math.Max(max.X - min.X, Math.Max(max.Y - min.Y, max.Z - min.Z)) / cells;
   if (!(cell > 0) || vertexCount % 3 != 0) throw new InvalidDataException("Invalid STL mesh");
   var points = new Point3DCollection(); var vertices = new Dictionary<long, int>();
   var retained = new List<(int A, int B, int C)>(); var faces = new HashSet<(int, int, int)>();

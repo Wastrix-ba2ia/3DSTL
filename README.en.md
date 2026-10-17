@@ -1,4 +1,4 @@
-﻿# 3DSTL
+# 3DSTL
 
 **Free Windows model thumbnails · 中文 / English · MIT-licensed original source**
 
@@ -12,7 +12,7 @@ View models directly in File Explorer and on your desktop. Includes light gray r
 
 ## Installation
 
-Download `3DSTL-0.1.1-win-x64.zip` from Releases and extract the entire archive. Run **安装-Install.exe**, select English and click Install. A desktop shortcut is created. Windows 10/11 x64 is required. The bundle includes a portable Python/CAD runtime and Microsoft's signed .NET 8 Desktop Runtime installer. Original project binaries are currently unsigned.
+Download `3DSTL-0.1.2-win-x64.zip` from Releases and extract the entire archive. Run **安装-Install.exe**, select English and click Install. A desktop shortcut is created. Windows 10/11 x64 is required. The bundle includes a portable Python/CAD runtime and Microsoft's signed .NET 8 Desktop Runtime installer. Original project binaries are currently unsigned.
 
 ## All supported extensions
 
@@ -64,3 +64,7 @@ Dependencies retain their own licenses; Open CASCADE uses LGPL with its exceptio
 ## Online updates
 
 Starting with 0.1.1, the desktop edition checks this repository’s stable GitHub Releases at most once per day on startup, downloads available updates in the background, and verifies SHA256 before offering **Install update**. You can disable automatic checks/downloads or check manually. Versioned installs retain the previous app, language settings and association-recovery data. The UI includes a GitHub project link. Version 0.1.0 needs one manual upgrade first. The Store edition remains updated by Microsoft Store. Sign out/in if Explorer still holds the previous thumbnail component.
+
+### 0.1.2: large 3MF and upright previews
+
+Streams 3MF meshes (512 MiB compressed input, 1 GiB per model XML), reducing meshes over 1.5 million faces for gray previews. Larger 3MFs run last in the desktop refresh queue. Clearly elongated, tapered single meshes are oriented tip-up; ambiguous, round and multi-part shapes retain their orientation. Original files and embedded fallback images are unchanged. Safety limits and first-render latency still apply.

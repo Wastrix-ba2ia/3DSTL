@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 
 class LargeStlTest {
@@ -26,6 +27,10 @@ class LargeStlTest {
    Assert(!LargeStl.IsLarge(small) && LargeStl.IsLarge(large), "Large-file classification failed");
    var ordered = ThumbnailRefresh.OrderFiles(new[] { large, small }).ToArray();
    Assert(ordered.SequenceEqual(new[] { small, large }), "Large STL must run after a small model even when enqueued first");
+   string big3mf=Path.Combine(root,"large.3mf");
+   using(var zip=ZipFile.Open(big3mf,ZipArchiveMode.Create)){using var stream=zip.CreateEntry("3D/3dmodel.model").Open();var zeros=new byte[1024*1024];for(int i=0;i<65;i++)stream.Write(zeros);}
+   Assert(LargeStl.IsLarge(big3mf),"Large expanded 3MF was not deferred");
+   Assert(ThumbnailRefresh.OrderFiles(new[]{big3mf,small}).First()==small,"Large 3MF must follow normal models");
    string missing = Path.Combine(root, "missing.stl");
    Assert(ThumbnailRefresh.OrderFiles(new[] { small, missing }).Contains(missing), "Unavailable input must be reported as a failure, not silently omitted");
    using (var reader = new BinaryReader(File.OpenRead(large))) {
