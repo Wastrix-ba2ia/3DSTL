@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+ <PropertyGroup>
+  <TargetFramework>net8.0-windows</TargetFramework><UseWPF>true</UseWPF><UseWindowsForms>true</UseWindowsForms>
+  <OutputType>WinExe</OutputType><EnableDefaultItems>false</EnableDefaultItems>
+  <AssemblyName>3DSTL.Refresh</AssemblyName><PlatformTarget>x64</PlatformTarget>
+ </PropertyGroup>
+ <ItemGroup><Compile Include="ThumbnailRefresh.cs"/><Compile Include="LargeStl.cs"/></ItemGroup>
+</Project>

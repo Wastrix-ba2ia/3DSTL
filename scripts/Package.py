@@ -1,9 +1,10 @@
 from pathlib import Path
 import zipfile,hashlib,re
 root=Path(__file__).resolve().parents[1]
-folder=root/'artifacts/3DSTL-0.1.0-win-x64'
-output=root/'artifacts/3DSTL-0.1.0-win-x64.zip'
-blocked={'associations.json','previous-handler.txt','previous-format-handlers.json','auth.json','pubg-profile.xml','host-trace.txt','pyvenv.cfg'}
+version=(root/'VERSION').read_text().strip()
+folder=root/f'artifacts/3DSTL-{version}-win-x64'
+output=root/f'artifacts/3DSTL-{version}-win-x64.zip'
+blocked={'associations.json','previous-handler.txt','previous-format-handlers.json','auth.json','pubg-profile.xml','host-trace.txt','pyvenv.cfg','updates.json','update.log','thumbnail-refresh.log'}
 files=[]
 for path in sorted(folder.rglob('*')):
  if not path.is_file() or '__pycache__' in path.parts or path.suffix in ('.pyc','.pdb'):continue

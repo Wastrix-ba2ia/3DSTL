@@ -1,0 +1,4 @@
+<Project Sdk="Microsoft.NET.Sdk">
+ <PropertyGroup><TargetFramework>net8.0-windows</TargetFramework><UseWindowsForms>true</UseWindowsForms><OutputType>WinExe</OutputType><EnableDefaultItems>false</EnableDefaultItems><AssemblyName>3DSTL.Update</AssemblyName><Version>0.1.1</Version></PropertyGroup>
+ <ItemGroup><Compile Include="Updater.cs"/><Compile Include="UpdateClient.cs"/></ItemGroup>
+</Project>

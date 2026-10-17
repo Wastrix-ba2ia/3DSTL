@@ -1,0 +1,5 @@
+<Project>
+ <!-- Projects in the same source folder must not reuse apphost.exe or NuGet
+      intermediate files. Otherwise an updater EXE can launch the manager DLL. -->
+ <PropertyGroup><BaseIntermediateOutputPath>obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath></PropertyGroup>
+</Project>

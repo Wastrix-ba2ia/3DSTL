@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+ <PropertyGroup>
+  <TargetFramework>net8.0-windows</TargetFramework><UseWPF>true</UseWPF><UseWindowsForms>true</UseWindowsForms>
+  <OutputType>Exe</OutputType><EnableDefaultItems>false</EnableDefaultItems><StartupObject>LargeStlTest</StartupObject>
+ </PropertyGroup>
+ <ItemGroup><Compile Include="LargeStlTest.cs"/><Compile Include="../src/LargeStl.cs"/><Compile Include="../src/ThumbnailRefresh.cs"/></ItemGroup>
+</Project>

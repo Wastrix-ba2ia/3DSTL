@@ -1,7 +1,8 @@
 ﻿param([string]$Python='python')
 $ErrorActionPreference='Stop'
 $root=Split-Path $PSScriptRoot -Parent
-$out=Join-Path $root 'artifacts\3DSTL-0.1.0-win-x64'
+$version=(Get-Content (Join-Path $root 'VERSION') -Raw).Trim()
+$out=Join-Path $root "artifacts\3DSTL-$version-win-x64"
 $runtime=Join-Path $out 'cad-runtime'
 New-Item -ItemType Directory -Path $runtime -Force | Out-Null
 $archive=Join-Path $root 'artifacts\python-embed.zip'

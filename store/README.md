@@ -1,4 +1,4 @@
-# Microsoft Store 提交 / Submission
+﻿# Microsoft Store 提交 / Submission
 
 商店 ID：9NQ6SSHMXRQM。包身份见 identity.json。
 
@@ -28,3 +28,5 @@ Python/CAD 环境随包附带。现有传统版缩略图处理器可能优先，
 ## 构建
 需要 .NET 8 SDK、Python 3.12（Pillow）、Zig 0.13、Windows SDK MakeAppx，准备好 portable runtime 后运行 Build-Store.ps1。
 LLVM libc++ / libc++abi / libunwind 使用 Apache-2.0 with LLVM exceptions；发布时保留相关版权许可，当前包包含于 ThirdParty。
+## 本地开发变更（尚未提交）
+大 STL 支持的源码修改与验证见 [大模型记录](../docs/LARGE-MODELS.md)。已提交认证的 `0.2.0.0` MSIX 尚未替换。

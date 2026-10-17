@@ -2,7 +2,8 @@
 $ErrorActionPreference='Stop'
 $root=Split-Path $PSScriptRoot -Parent
 $out=Join-Path $root 'artifacts\store-payload'
-$base=Join-Path $root 'artifacts\3DSTL-0.1.0-win-x64'
+$version=(Get-Content (Join-Path $root 'VERSION') -Raw).Trim()
+$base=Join-Path $root "artifacts\3DSTL-$version-win-x64"
 if(!(Test-Path (Join-Path $base 'cad-runtime\python.exe'))){throw 'Prepare the portable runtime first: scripts/Prepare-Runtime.ps1'}
 & $Python (Join-Path $PSScriptRoot 'PrepareManager.py')
 & $Dotnet publish (Join-Path $PSScriptRoot 'Worker.csproj') -c Release -o (Join-Path $out 'worker')
