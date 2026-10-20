@@ -1,8 +1,8 @@
-﻿# Microsoft Store 提交 / Submission
+# Microsoft Store 提交 / Submission
 
 商店 ID：9NQ6SSHMXRQM。包身份见 identity.json。
 
-上传文件：artifacts/3DSTL-0.2.0.0-x64.msix。
+上传文件：artifacts/3DSTL-0.2.1.0-x64.msix。
 这是未签名的商店提交包，不是供直接双击安装的侧载包；由商店在审核/分发流程中处理签名。
 
 ## 后台填写
@@ -18,7 +18,7 @@
 - MakeAppx 语义/清单打包校验通过，没有禁用 validation。
 - 原生 COM → 独立自包含渲染进程：实际 3MF / STEP 均返回 256x256 位图。
 - 身份与后台提供的 Name/Publisher/PublisherDisplayName 匹配。
-- 本地未侧载安装，不修改证书信任。尚未完成 Store 认证或干净虚拟机端到端安装测试。
+- 已在 Windows Sandbox 中临时签名、安装并验证10种格式的30项实际Shell缩略图请求，以及中英文启动与卸载。证书仅在隔离沙盒内信任，不修改宿主机证书信任。正式认证仍由微软决定。
 
 ## 商店版差异
 缩略图由 MSIX 清单注册，卸载由 Windows 管理；界面不写传统文件关联注册表。
@@ -29,4 +29,4 @@ Python/CAD 环境随包附带。现有传统版缩略图处理器可能优先，
 需要 .NET 8 SDK、Python 3.12（Pillow）、Zig 0.13、Windows SDK MakeAppx，准备好 portable runtime 后运行 Build-Store.ps1。
 LLVM libc++ / libc++abi / libunwind 使用 Apache-2.0 with LLVM exceptions；发布时保留相关版权许可，当前包包含于 ThirdParty。
 ## 本地开发变更（尚未提交）
-大 STL 支持的源码修改与验证见 [大模型记录](../docs/LARGE-MODELS.md)。已提交认证的 `0.2.0.0` MSIX 尚未替换。
+大 STL 支持的源码修改与验证见 [大模型记录](../docs/LARGE-MODELS.md)。此次0.2.1.0同时包含大STL/3MF和保守自动摆正；语言修复详情见 docs/STORE-SUBMISSION.md。

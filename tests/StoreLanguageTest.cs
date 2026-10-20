@@ -1,0 +1,12 @@
+using System;using System.IO;using System.Linq;using System.Drawing;using System.Text.RegularExpressions;using System.Windows.Forms;using System.Collections.Generic;
+class StoreLanguageTest{
+ static IEnumerable<Control> All(Control c){foreach(Control child in c.Controls){yield return child;foreach(var nested in All(child))yield return nested;}}
+ static void Assert(bool ok,string reason){if(!ok)throw new Exception(reason);}
+ static void English(ManagerForm form){foreach(var c in All(form)){if(c is ComboBox)continue;Assert(!Regex.IsMatch(c.Text??"",@"[\u4e00-\u9fff]"),"Untranslated control: "+c.Text);if(c is CheckedListBox list)foreach(var item in list.Items)Assert(!Regex.IsMatch(item.ToString(),@"[\u4e00-\u9fff]"),"Untranslated format: "+item);}}
+ [STAThread]static int Main(){Application.EnableVisualStyles();string root=Path.Combine(Path.GetTempPath(),"3DSTL-store-language-"+Guid.NewGuid());Directory.CreateDirectory(root);try{
+ using(var form=new ManagerForm(false,root)){form.Show();var combo=All(form).OfType<ComboBox>().Single();for(int i=0;i<8;i++){combo.SelectedIndex=1;Application.DoEvents();English(form);Assert(File.ReadAllText(Path.Combine(root,"language.txt"))=="en","English preference not saved");combo.SelectedIndex=0;Application.DoEvents();Assert(All(form).Any(c=>c.Text=="刷新缩略图"),"Chinese did not return");}combo.SelectedIndex=1;Application.DoEvents();English(form);Directory.CreateDirectory("artifacts/certification-20261020");using(var bmp=new Bitmap(form.Width,form.Height)){form.DrawToBitmap(bmp,new Rectangle(Point.Empty,bmp.Size));bmp.Save("artifacts/certification-20261020/store-en.png");}}
+ using(var reopened=new ManagerForm(false,root)){reopened.Show();Application.DoEvents();English(reopened);Assert(reopened.Text=="3DSTL · Model Thumbnails","Restart lost English title");var combo=All(reopened).OfType<ComboBox>().Single();Assert(combo.SelectedIndex==1,"Restart lost English selection");combo.SelectedIndex=0;Application.DoEvents();using var bmp=new Bitmap(reopened.Width,reopened.Height);reopened.DrawToBitmap(bmp,new Rectangle(Point.Empty,bmp.Size));bmp.Save("artifacts/certification-20261020/store-zh.png");}
+ using(var reopened=new ManagerForm(false,root)){Assert(All(reopened).OfType<ComboBox>().Single().SelectedIndex==0,"Restart lost Chinese selection");}
+ Console.WriteLine("PASS Store: 8 real language-switch cycles, all English controls/formats translated, Chinese restoration, preferences, English/Chinese restart, screenshots; no personal settings changed");return 0;
+ }finally{Directory.Delete(root,true);}}
+}

@@ -7,6 +7,7 @@ for size,name in [(44,'Square44.png'),(150,'Square150.png'),(50,'StoreLogo.png')
  d.polygon([(75*s,20*s),(128*s,48*s),(75*s,78*s),(22*s,48*s)],fill='#e4dfd0')
  d.polygon([(22*s,48*s),(75*s,78*s),(75*s,132*s),(22*s,101*s)],fill='#aaa99f')
  d.polygon([(75*s,78*s),(128*s,48*s),(128*s,101*s),(75*s,132*s)],fill='#d1cec1');image.save(assets/name)
+version=(root/'store/VERSION').read_text().strip()
 identity=json.loads((root/'store/identity.json').read_text())
 formats=['3mf','stl','obj','ply','off','amf','gcode','gco','step','stp','sldprt','sldasm','slddrw','prtdot','asmdot','drwdot','eprt','easm','edrw']
 extensions=[];classes=[]
@@ -16,7 +17,7 @@ for n,ext in enumerate(formats):
  classes.append(f'<com:Class Id="{clsid}" Path="shell\\3DSTL.Thumbnail.dll" ThreadingModel="Both"/>')
 manifest=f'''<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:desktop2="http://schemas.microsoft.com/appx/manifest/desktop/windows10/2" xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10" xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities" IgnorableNamespaces="uap desktop2 com rescap">
-<Identity Name="{identity['Name']}" Publisher="{identity['Publisher']}" ProcessorArchitecture="x64" Version="0.2.0.0"/>
+<Identity Name="{identity['Name']}" Publisher="{identity['Publisher']}" ProcessorArchitecture="x64" Version="{version}"/>
 <Properties><DisplayName>3DSTL</DisplayName><PublisherDisplayName>{identity['PublisherDisplayName']}</PublisherDisplayName><Logo>Assets\\StoreLogo.png</Logo><Description>Local model thumbnails for Windows File Explorer</Description></Properties>
 <Resources><Resource Language="zh-CN"/><Resource Language="en-US"/></Resources>
 <Dependencies><TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.26100.0"/></Dependencies>

@@ -26,6 +26,7 @@ partial class ManagerForm {
   updateButton.BackColor = Color.FromArgb(38,71,94);updateButton.ForeColor=ForeColor;
   automaticUpdates.Checked = updateSettings.Automatic && !UpdateClient.StoreBuild;
   automaticUpdates.Enabled = !UpdateClient.StoreBuild;
+  automaticUpdates.Visible = !UpdateClient.StoreBuild;
   bottom.Controls.Add(updateButton);bottom.Controls.Add(automaticUpdates);bottom.SetFlowBreak(automaticUpdates,true);
   updateStatus.ForeColor=Color.FromArgb(170,187,204);bottom.Controls.Add(updateStatus);
   updateButton.Click += async (_,_) => {

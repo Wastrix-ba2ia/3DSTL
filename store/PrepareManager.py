@@ -1,4 +1,4 @@
-﻿from pathlib import Path
+from pathlib import Path
 root=Path(__file__).resolve().parents[1]
 s=(root/'src/Manager.cs').read_text(encoding='utf-8-sig')
 a=s.index('class AssociationManager {');b=s.index('partial class ManagerForm:Form {')
@@ -23,9 +23,22 @@ s=s.replace('repair.Text="一键修复 / 安装"','repair.Text="刷新缩略图"
 s=s.replace('修复勾选的格式；卸载恢复全部格式的旧设置。首次生成较慢。','商店版由 Windows 管理格式关联；卸载时自动移除。')
 s=s.replace('"已修复 "+selected.Length+" 种格式。返回目录按 F5 查看。"','"已通知 Windows 刷新。返回目录按 F5 查看。"')
 s=s.replace('"已修复 "+selected.Length+" 种格式。桌面预览在后台更新，大 STL 最后处理。"','"已通知 Windows 刷新。返回目录按 F5 查看。"')
-s=s.replace('{"一键修复 / 安装","Repair / Install"}', '{"刷新缩略图","Refresh thumbnails"},{"在 Windows 中卸载","Uninstall via Windows"},{"商店版由 Windows 管理格式关联；卸载时自动移除。","Windows manages Store file associations and removes them on uninstall."},{"请在 Windows 设置中卸载 3DSTL，Windows 会自动移除缩略图关联。","Uninstall 3DSTL in Windows Settings. Windows removes the thumbnail associations."},{"已通知 Windows 刷新。返回目录按 F5 查看。","Windows has been notified. Press F5 in File Explorer."},{"一键修复 / 安装","Repair / Install"}')
+s=s.replace('{"一键修复 / 安装","Repair / Install"}', '{"刷新缩略图","Refresh thumbnails"},{"在 Windows 中卸载","Uninstall via Windows"},{"请在 Windows 设置中卸载 3DSTL，Windows 会自动移除缩略图关联。","Uninstall 3DSTL in Windows Settings. Windows removes the thumbnail associations."},{"已通知 Windows 刷新。返回目录按 F5 查看。","Windows has been notified. Press F5 in File Explorer."},{"一键修复 / 安装","Repair / Install"}')
+s=s.replace('Repair selected formats. Uninstall restores previous associations.', 'Windows manages Store file associations and removes them on uninstall.')
+s=s.replace('Uninstall all model thumbnail handlers and restore previous associations?', 'Open Windows Settings to uninstall 3DSTL?')
+s=s.replace('卸载全部模型缩略图功能并恢复原关联？', '在 Windows 设置中卸载 3DSTL？')
+s=s.replace('Uninstall all model thumbnail handlers and restore previous associations?', 'Open Windows Settings to uninstall 3DSTL?')
+s=s.replace('正在修复勾选的格式，请稍候…','正在通知 Windows 刷新，请稍候…').replace('Repairing selected formats…','Notifying Windows to refresh…')
+# The Store build has no desktop refresh queue/log. Do not expose a dead log link.
+s=s.replace('bottom.Controls.Add(logs);', '')
 s=s.replace('if(args.Contains("--selftest")){SelfTest();return;}','if(args.Contains("--selftest"))return;')
 s=s.replace('if(args.Contains("--selftest-ui")){SelfTestUi();return;}','if(args.Contains("--selftest-ui"))return;')
 a=s.find(' static void SelfTestUi(){')
 if a>=0:s=s[:a]+'}'+chr(10)
+# Fail the build if generated localization keys collide (the 0.2.0.0 certification failure).
+import re,collections
+start=s.index('var map=new Dictionary<string,string>{');end=s.index('};',start)
+keys=re.findall(r'\{"([^"\n]+)",',s[start:end])
+duplicates=[key for key,count in collections.Counter(keys).items() if count>1]
+if duplicates:raise RuntimeError('Duplicate generated translation keys: '+repr(duplicates))
 (root/'store/StoreManager.cs').write_text(s,encoding='utf-8-sig')
