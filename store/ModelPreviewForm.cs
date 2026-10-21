@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -74,7 +74,7 @@ sealed class ModelPreviewForm : Form {
   file=Path.GetFullPath(file);if(!File.Exists(file))throw new FileNotFoundException();
   string ext=Path.GetExtension(file).TrimStart('.').ToLowerInvariant();
   if(!AssociationManager.Formats.Contains(ext))throw new InvalidDataException();
-  long limit=ext=="stl"?1024L*1024*1024:ext=="3mf"?512L*1024*1024:128L*1024*1024;
+  long limit=ext=="stl"?1024L*1024*1024:(ext=="3mf"||ext=="obj")?512L*1024*1024:128L*1024*1024;
   if(new FileInfo(file).Length<=0||new FileInfo(file).Length>limit)throw new InvalidDataException();
   string exe=Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"..","worker","3DSTL.Render.exe"));
   if(!File.Exists(exe))throw new FileNotFoundException();

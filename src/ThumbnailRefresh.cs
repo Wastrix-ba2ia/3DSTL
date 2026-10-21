@@ -71,7 +71,8 @@ class ThumbnailRefresh {
     log.WriteLine("CURRENT " + file);
     object cache = null; RefreshShellItem item = null;
     try {
-     long limit = Path.GetExtension(file).Equals(".stl", StringComparison.OrdinalIgnoreCase) ? LargeStl.InputLimit : 128L * 1024 * 1024;
+     string extension=Path.GetExtension(file).ToLowerInvariant();
+     long limit = extension==".stl" ? LargeStl.InputLimit : (extension==".obj"||extension==".3mf") ? 512L*1024*1024 : 128L * 1024 * 1024;
      if (new FileInfo(file).Length > limit) throw new IOException("Input exceeds " + limit + " bytes");
      Guid iid = typeof(RefreshShellItem).GUID;
      SHCreateItemFromParsingName(file, IntPtr.Zero, ref iid, out item);

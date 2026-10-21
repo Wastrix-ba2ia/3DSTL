@@ -13,6 +13,8 @@ public static class LargeStl {
  public const uint Threshold = 1500000;
  const int PreviewFaces = 400000, Cells = 128;
  public static bool IsLarge(string path) {
+  if (Path.GetExtension(path).Equals(".obj", StringComparison.OrdinalIgnoreCase))
+   return new FileInfo(path).Length > 64L * 1024 * 1024;
   if (Path.GetExtension(path).Equals(".3mf", StringComparison.OrdinalIgnoreCase)) {
    using var archive = ZipFile.OpenRead(path);
    return archive.Entries.Where(e => e.FullName.EndsWith(".model",StringComparison.OrdinalIgnoreCase)).Sum(e => e.Length) > 64L * 1024 * 1024;

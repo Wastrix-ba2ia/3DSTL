@@ -83,8 +83,25 @@ elif ext in ('.gcode','.gco'):
  write_stl(triangles)
 else:
  import trimesh
- mesh=trimesh.load(str(source),force='scene',process=False)
+ # Thumbnails use a neutral material: do not load OBJ textures/MTL into memory.
+ mesh=trimesh.load(str(source),force='scene',process=False,**({'skip_materials':True} if ext=='.obj' else {}))
  if isinstance(mesh,trimesh.Scene):mesh=mesh.to_geometry()
  if not isinstance(mesh,trimesh.Trimesh) or not len(mesh.faces):raise ValueError('No mesh faces')
- if len(mesh.faces)>1500000:raise ValueError('Mesh too complex')
- mesh.export(str(dest),file_type='stl')
+ if ext=='.obj':
+  # Read all faces, then let the bounded STL preview reducer simplify the display.
+  # Export in chunks rather than allocating the complete triangles/STL byte array.
+  import numpy as np
+  if len(mesh.faces)>20000000:raise ValueError('OBJ exceeds 20 million preview triangles')
+  record=np.dtype([('normal','<f4',(3,)),('vertices','<f4',(3,3)),('attribute','<u2')])
+  with dest.open('wb') as output:
+   output.write(b'3DSTL OBJ geometry preview'.ljust(80,b'\0'))
+   output.write(struct.pack('<I',len(mesh.faces)))
+   for start in range(0,len(mesh.faces),8192):
+    faces=mesh.faces[start:start+8192]
+    data=np.zeros(len(faces),dtype=record)
+    data['vertices']=mesh.vertices[faces]
+    if not np.isfinite(data['vertices']).all():raise ValueError('Non-finite OBJ geometry')
+    data.tofile(output)
+ else:
+  if len(mesh.faces)>1500000:raise ValueError('Mesh too complex')
+  mesh.export(str(dest),file_type='stl')

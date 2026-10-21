@@ -9,7 +9,7 @@
  public void Initialize(IStream stream,uint mode){
   if(input!=null)throw new COMException("Already initialized");
   System.Runtime.InteropServices.ComTypes.STATSTG stat;stream.Stat(out stat,1);
-  long limit=Extension==".stl"?LargeStl.InputLimit:Extension==".3mf"?512L*1024*1024:128L*1024*1024;
+  long limit=Extension==".stl"?LargeStl.InputLimit:(Extension==".3mf"||Extension==".obj")?512L*1024*1024:128L*1024*1024;
   if(stat.cbSize<=0||stat.cbSize>limit)throw new InvalidDataException("Input too large");
   string temp=Path.Combine(Path.GetTempPath(),"3DSTL-"+Guid.NewGuid()+Extension);
   var read=Marshal.AllocCoTaskMem(4);
@@ -21,7 +21,7 @@
  public void GetThumbnail(uint size,out IntPtr bitmap,out uint alpha){
   if(input==null)throw new COMException("Not initialized");
   IntPtr result=IntPtr.Zero;Exception error=null;object gate=new object();bool abandoned=false;
-  int side=(int)Math.Max(32,Math.Min(size,512));bool large=LargeStl.IsLarge(input)||Extension==".3mf";
+  int side=(int)Math.Max(32,Math.Min(size,512));bool large=LargeStl.IsLarge(input)||Extension==".3mf"||Extension==".obj";
   var thread=new Thread(()=>{
    try{
     if(large)Thread.CurrentThread.Priority=ThreadPriority.Lowest;
