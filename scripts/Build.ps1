@@ -1,4 +1,4 @@
-﻿param([string]$Dotnet='dotnet')
+param([string]$Dotnet='dotnet')
 $ErrorActionPreference='Stop'
 $root=Split-Path $PSScriptRoot -Parent
 $version=(Get-Content (Join-Path $root 'VERSION') -Raw).Trim()
@@ -11,6 +11,9 @@ if($LASTEXITCODE -ne 0){throw 'Manager build failed'}
 if($LASTEXITCODE -ne 0){throw 'Thumbnail refresher build failed'}
 & $Dotnet build (Join-Path $root 'src\Updater.csproj') -c Release -p:Version=$version -o (Join-Path $out 'manager\updater')
 if($LASTEXITCODE -ne 0){throw 'Updater build failed'}
+& $Dotnet publish (Join-Path $root 'store\Worker.csproj') -c Release -p:Version=$version -o (Join-Path $out 'worker')
+if($LASTEXITCODE -ne 0){throw 'Model preview worker publish failed'}
+Copy-Item (Join-Path $root 'store\Samples') -Destination $out -Recurse -Force
 @{product='3DSTL';version=$version;platform='win-x64'} | ConvertTo-Json | Set-Content (Join-Path $out 'release.json') -Encoding utf8
 $csc=Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
 & $csc /nologo /target:winexe /platform:x64 "/out:$out\安装-Install.exe" /r:System.Drawing.dll /r:System.Windows.Forms.dll /r:Microsoft.CSharp.dll (Join-Path $root 'src\Setup.cs')

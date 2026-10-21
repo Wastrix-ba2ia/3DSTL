@@ -1,14 +1,14 @@
-## 3DSTL v0.1.2
+## 3DSTL v0.1.3
 
-下载 `3DSTL-0.1.2-win-x64.zip`，完整解压并运行 `安装-Install.exe`。已有 0.1.1 可以在软件内检查更新、下载后点击“安装更新”。
+下载 `3DSTL-0.1.3-win-x64.zip`，完整解压并运行 `安装-Install.exe`。已有 0.1.1/0.1.2 可在软件中检查更新、下载后点击安装更新。
 
-- 大 3MF 改为流式读取：压缩输入上限 512 MiB，单个模型 XML 上限 1 GiB，总 XML 上限 2 GiB。单个网格超过 150 万面时扫描全部三角形，生成最多 40 万面的简化灰色显示网格。
-- 较大 3MF 在桌面刷新队列中排在普通模型之后，低优先级处理，最多等待 180 秒。
-- 自动尝试摆正方向明确、细长且有明显粗细端的单体；圆形头骨、宽面罩、方向不明及多零件组合保留原方向。不会保证所有耳朵或角都能摆正。
-- 原始模型不修改、不上传；内置备用图片不旋转。旧缩略图需要刷新才会变化；Explorer 占用旧组件时可重新登录 Windows。
+- 新增应用内模型图片预览：点击“打开模型预览”，再打开文件、拖入文件或查看内置示例。
+- 向 3DSTL.exe 传入本地模型路径时直接显示预览；支持中文及带空格路径。
+- 独立后台渲染，中英文加载/错误提示，可取消、最长等待3分钟；原始模型不修改。
+- 包含大 STL/3MF 简化缩略图及保守自动摆正；保留传统版关联修复/恢复和 GitHub 在线更新。
 
-首次读取仍会较慢，也会使用临时磁盘。实测五个 NAS 3MF 单次几何渲染约 2～12 秒，进程峰值约 190～390 MiB（不含 Windows 多尺寸重复请求）。细节会简化；超出安全预算或解析失败时仍可能使用内置图片。OBJ 限制未调整，持久缓存及多尺寸渲染复用尚未实现。已提交认证的 Microsoft Store MSIX 未替换。
+这是渲染后的图片预览，不提供交互式3D旋转/编辑。大模型首次生成仍可能慢，超出预算或损坏的文件会显示错误；专有 CAD 格式仍仅尝试兼容的内置图片。此 ZIP 是可安装的传统桌面版；Microsoft Store 0.2.2.0 单独接受微软认证，版本号不混用。
 
 ---
 
-Version 0.1.2 streams large 3MF meshes and generates reduced gray previews instead of immediately falling back at 1.5 million faces. Limits: 512 MiB compressed input, 1 GiB per model XML and 2 GiB total XML. Larger 3MFs run after ordinary desktop-refresh jobs. Conservative automatic upright orientation applies to clearly elongated, tapered single meshes; ambiguous, round and multi-part shapes retain their orientation. Original files are unchanged. First-render latency, temporary disk usage and safety limits remain; embedded fallback images are not rotated. Existing 0.1.1 users can check for updates in the app. Verify the ZIP with SHA256SUMS.txt.
+Version 0.1.3 adds in-app model image previews with Open model, drag-and-drop and a bundled sample. Passing a local file path to 3DSTL.exe opens its preview. Background rendering includes bilingual loading/error feedback, cancellation and timeout. Original models stay unchanged. Large STL/3MF reduction and conservative upright orientation are included. Desktop association repair/recovery and GitHub updates remain available. This is an image preview, not an interactive 3D editor. Store version 0.2.2.0 is distributed and reviewed separately.

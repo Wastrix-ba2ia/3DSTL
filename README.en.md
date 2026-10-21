@@ -12,7 +12,7 @@ View models directly in File Explorer and on your desktop. Includes light gray r
 
 ## Installation
 
-Download `3DSTL-0.1.2-win-x64.zip` from Releases and extract the entire archive. Run **安装-Install.exe**, select English and click Install. A desktop shortcut is created. Windows 10/11 x64 is required. The bundle includes a portable Python/CAD runtime and Microsoft's signed .NET 8 Desktop Runtime installer. Original project binaries are currently unsigned.
+Download `3DSTL-0.1.3-win-x64.zip` from Releases and extract the entire archive. Run **安装-Install.exe**, select English and click Install. A desktop shortcut is created. Windows 10/11 x64 is required. The bundle includes a portable Python/CAD runtime and Microsoft's signed .NET 8 Desktop Runtime installer. Original project binaries are currently unsigned.
 
 ## All supported extensions
 
@@ -68,3 +68,7 @@ Starting with 0.1.1, the desktop edition checks this repository’s stable GitHu
 ### 0.1.2: large 3MF and upright previews
 
 Streams 3MF meshes (512 MiB compressed input, 1 GiB per model XML), reducing meshes over 1.5 million faces for gray previews. Larger 3MFs run last in the desktop refresh queue. Clearly elongated, tapered single meshes are oriented tip-up; ambiguous, round and multi-part shapes retain their orientation. Original files and embedded fallback images are unchanged. Safety limits and first-render latency still apply.
+
+### 0.1.3: in-app image previews
+
+Click Open model preview, then Open model or Try sample, or drop a file into the preview window. File paths passed to 3DSTL.exe also open a preview. A separate local worker renders images with loading/error feedback, cancellation and timeout. Original files stay unchanged; this is not an interactive 3D editor. Desktop repair/recovery and GitHub updates remain available. Store version numbers are independent (0.2.2.0).

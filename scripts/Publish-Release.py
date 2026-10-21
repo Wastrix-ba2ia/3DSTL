@@ -51,7 +51,7 @@ except urllib.error.HTTPError as error:
         raise
     release = request(api + '/releases', {
         'tag_name': 'v' + version, 'target_commitish': commit,
-        'name': '3DSTL v' + version + ' · 大模型预览 / Large model previews',
+        'name': '3DSTL v' + version + ' · 模型预览 / Model previews',
         'body': (root / 'RELEASE-NOTES.md').read_text(encoding='utf-8-sig'),
         'draft': True, 'prerelease': False,
     })

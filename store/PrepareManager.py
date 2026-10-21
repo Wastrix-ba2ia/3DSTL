@@ -35,10 +35,6 @@ s=s.replace('if(args.Contains("--selftest")){SelfTest();return;}','if(args.Conta
 s=s.replace('if(args.Contains("--selftest-ui")){SelfTestUi();return;}','if(args.Contains("--selftest-ui"))return;')
 a=s.find(' static void SelfTestUi(){')
 if a>=0:s=s[:a]+'}'+chr(10)
-# File associations must actually open a model, not just display the manager.
-s=s.replace('using(var form=new ManagerForm(args.Length==0))', 'if(args.Length==3&&args[0]=="--preview-snapshot"){Environment.ExitCode=ModelPreviewForm.Snapshot(args[1],args[2]);return;}if(args.Length==2&&args[0]=="--preview"){Application.Run(new ModelPreviewForm(args[1]));return;}if(args.Length==1&&!args[0].StartsWith("--")){Application.Run(new ModelPreviewForm(args[0]));return;}using(var form=new ManagerForm(args.Length==0))')
-s=s.replace('bottom.Controls.Add(about);', 'bottom.Controls.Add(about);var preview=new LinkLabel{Text="打开模型预览",AutoSize=true,LinkColor=Color.LightSkyBlue};preview.LinkClicked+=delegate{new ModelPreviewForm().Show(this);};bottom.Controls.Add(preview);')
-s=s.replace('{"GitHub 项目主页","GitHub project"}', '{"打开模型预览","Open model preview"},{"GitHub 项目主页","GitHub project"}')
 # Fail the build if generated localization keys collide (the 0.2.0.0 certification failure).
 import re,collections
 start=s.index('var map=new Dictionary<string,string>{');end=s.index('};',start)
