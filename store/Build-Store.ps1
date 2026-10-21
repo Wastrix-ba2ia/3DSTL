@@ -17,6 +17,7 @@ New-Item -ItemType Directory -Path (Join-Path $out 'shell') -Force | Out-Null
 if($LASTEXITCODE -ne 0){throw 'Native thumbnail build failed'}
 Copy-Item (Join-Path $base 'cad-runtime') -Destination $out -Recurse -Force
 Copy-Item (Join-Path $root 'src\ConvertMesh.py'),(Join-Path $root 'src\EmbeddedCadPreview.py'),(Join-Path $root 'LICENSE'),(Join-Path $root 'THIRD-PARTY-NOTICES.txt') -Destination $out -Force
+Copy-Item (Join-Path $PSScriptRoot 'Samples') -Destination $out -Recurse -Force
 Copy-Item (Join-Path $root 'docs\PRIVACY.md') -Destination (Join-Path $out 'PRIVACY.md') -Force
 & $Python (Join-Path $PSScriptRoot 'PrepareManifest.py')
 # Include upstream runtime and native-library notices in the payload before publishing.

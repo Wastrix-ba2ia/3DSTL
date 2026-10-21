@@ -2,7 +2,7 @@
 
 商店 ID：9NQ6SSHMXRQM。包身份见 identity.json。
 
-上传文件：artifacts/3DSTL-0.2.1.0-x64.msix。
+上传文件：artifacts/3DSTL-0.2.2.0-x64.msix。
 这是未签名的商店提交包，不是供直接双击安装的侧载包；由商店在审核/分发流程中处理签名。
 
 ## 后台填写
@@ -30,3 +30,5 @@ Python/CAD 环境随包附带。现有传统版缩略图处理器可能优先，
 LLVM libc++ / libc++abi / libunwind 使用 Apache-2.0 with LLVM exceptions；发布时保留相关版权许可，当前包包含于 ThirdParty。
 ## 本地开发变更（尚未提交）
 大 STL 支持的源码修改与验证见 [大模型记录](../docs/LARGE-MODELS.md)。此次0.2.1.0同时包含大STL/3MF和保守自动摆正；语言修复详情见 docs/STORE-SUBMISSION.md。
+
+0.2.2.0 增加实际文件打开后的图片预览及内置示例，清单明确传入带引号的文件路径。ModelPreviewTest验证显示与取消；FileActivationTest.cpp通过ShellExecuteEx和MSIX注册的ProgID检查实际文件打开。测试沙盒必须记录实例ID，结束时用wsb stop --id回收，并检查vmmemWindowsSandbox退出。详情见docs/STORE-SUBMISSION.md。

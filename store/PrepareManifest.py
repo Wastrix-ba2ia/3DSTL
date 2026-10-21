@@ -13,10 +13,10 @@ formats=['3mf','stl','obj','ply','off','amf','gcode','gco','step','stp','sldprt'
 extensions=[];classes=[]
 for n,ext in enumerate(formats):
  clsid=f'D3D51000-17A0-4D18-BA10-{n:012x}'
- extensions.append(f'<uap:Extension Category="windows.fileTypeAssociation"><uap:FileTypeAssociation Name="model-{ext}"><uap:DisplayName>3DSTL {ext.upper()} preview</uap:DisplayName><uap:SupportedFileTypes><uap:FileType>.{ext}</uap:FileType></uap:SupportedFileTypes><desktop2:ThumbnailHandler Clsid="{clsid}"/></uap:FileTypeAssociation></uap:Extension>')
+ extensions.append(f'<uap3:Extension Category="windows.fileTypeAssociation"><uap3:FileTypeAssociation Name="model-{ext}" Parameters="--preview &quot;%1&quot;"><uap:DisplayName>3DSTL {ext.upper()} preview</uap:DisplayName><uap:SupportedFileTypes><uap:FileType>.{ext}</uap:FileType></uap:SupportedFileTypes><desktop2:ThumbnailHandler Clsid="{clsid}"/></uap3:FileTypeAssociation></uap3:Extension>')
  classes.append(f'<com:Class Id="{clsid}" Path="shell\\3DSTL.Thumbnail.dll" ThreadingModel="Both"/>')
 manifest=f'''<?xml version="1.0" encoding="utf-8"?>
-<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:desktop2="http://schemas.microsoft.com/appx/manifest/desktop/windows10/2" xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10" xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities" IgnorableNamespaces="uap desktop2 com rescap">
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3" xmlns:desktop2="http://schemas.microsoft.com/appx/manifest/desktop/windows10/2" xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10" xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities" IgnorableNamespaces="uap uap3 desktop2 com rescap">
 <Identity Name="{identity['Name']}" Publisher="{identity['Publisher']}" ProcessorArchitecture="x64" Version="{version}"/>
 <Properties><DisplayName>3DSTL</DisplayName><PublisherDisplayName>{identity['PublisherDisplayName']}</PublisherDisplayName><Logo>Assets\\StoreLogo.png</Logo><Description>Local model thumbnails for Windows File Explorer</Description></Properties>
 <Resources><Resource Language="zh-CN"/><Resource Language="en-US"/></Resources>
