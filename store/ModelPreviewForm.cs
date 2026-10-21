@@ -11,7 +11,7 @@ using System.Windows.Forms;
 sealed class ModelPreviewForm : Form {
  readonly PictureBox picture = new PictureBox { Dock=DockStyle.Fill, SizeMode=PictureBoxSizeMode.Zoom, BackColor=Color.FromArgb(225,225,223) };
  readonly Label status = new Label { Dock=DockStyle.Bottom, Height=56, Padding=new Padding(12), AutoEllipsis=true };
- readonly Button open = new Button { AutoSize=true }, sample = new Button { AutoSize=true };
+ readonly Button open = new Button { AutoSize=true }, sample = new Button { AutoSize=true }, settings = new Button { AutoSize=true };
  readonly ComboBox language = new ComboBox { DropDownStyle=ComboBoxStyle.DropDownList, Width=150 };
  readonly string languageFile, initialFile;
  CancellationTokenSource pending;
@@ -19,7 +19,7 @@ sealed class ModelPreviewForm : Form {
  string currentFile, error;
  public bool PreviewReady { get; private set; }
  public event Action<bool> PreviewCompleted;
- public ModelPreviewForm(string file=null, string settingsDirectory=null) {
+ public ModelPreviewForm(string file=null, string settingsDirectory=null, Action showSettings=null) {
   initialFile=file;
   languageFile=Path.Combine(settingsDirectory??Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"3DSTL"),"language.txt");
   try { english=File.Exists(languageFile)&&File.ReadAllText(languageFile).Trim()=="en"; } catch(IOException) {} catch(UnauthorizedAccessException) {}
@@ -27,9 +27,10 @@ sealed class ModelPreviewForm : Form {
   Font=new Font("Microsoft YaHei UI",10);BackColor=Color.FromArgb(19,28,42);ForeColor=Color.White;AllowDrop=true;
   var toolbar=new FlowLayoutPanel { Dock=DockStyle.Top,Height=54,Padding=new Padding(10) };
   language.ForeColor=Color.Black;language.BackColor=Color.White;
-  foreach(var button in new[]{open,sample}){button.FlatStyle=FlatStyle.Flat;button.BackColor=Color.FromArgb(38,71,94);button.ForeColor=Color.White;button.Padding=new Padding(6,2,6,2);}
+  foreach(var button in new[]{open,sample,settings}){button.FlatStyle=FlatStyle.Flat;button.BackColor=Color.FromArgb(38,71,94);button.ForeColor=Color.White;button.Padding=new Padding(6,2,6,2);}
   language.Items.AddRange(new object[]{"简体中文","English"});language.SelectedIndex=english?1:0;
   toolbar.Controls.Add(open);toolbar.Controls.Add(sample);toolbar.Controls.Add(language);
+  if(showSettings!=null){toolbar.Controls.Add(settings);settings.Click+=(_,_)=>showSettings();}
   Controls.Add(picture);Controls.Add(status);Controls.Add(toolbar);
   open.Click+=(_,_)=>{using var picker=new OpenFileDialog { Filter="3D models|"+string.Join(";",AssociationManager.Formats.Select(x=>"*."+x))+"|All files|*.*",CheckFileExists=true };if(picker.ShowDialog(this)==DialogResult.OK)_=LoadModel(picker.FileName);};
   sample.Click+=(_,_)=>{_=LoadModel(Path.Combine(AppContext.BaseDirectory,"..","Samples","sample.stl"));};
@@ -41,7 +42,7 @@ sealed class ModelPreviewForm : Form {
   Labels();
  }
  void Labels() {
-  open.Text=english?"Open model…":"打开模型…";sample.Text=english?"Try sample":"查看示例";
+  open.Text=english?"Open model…":"打开模型…";sample.Text=english?"Try sample":"查看示例";settings.Text=english?"Thumbnail settings":"缩略图设置";
   Text=PreviewReady?Path.GetFileName(currentFile)+" · 3DSTL":"3DSTL · "+(english?"Model preview":"模型预览");
   status.Text=busy?(english?"Generating preview, please wait… Large files may take up to 3 minutes.":"正在生成预览，请稍候… 大文件可能需要等待 3 分钟。"):
    error!=null?(english?"Cannot preview this file. ":"无法预览此文件。")+(error=="timeout"?(english?"Rendering timed out or was cancelled.":"渲染超时或已取消。"):error=="missing"?(english?"The selected file or renderer is missing.":"所选文件或渲染组件不存在。"):error=="invalid"?(english?"Unsupported, damaged, or too large. Try a smaller STL/3MF file.":"格式不支持、文件损坏或超过限制，请尝试较小的 STL/3MF 文件。"):(english?"Check file permissions or try a smaller STL/3MF file.":"请检查文件访问权限，或尝试较小的 STL/3MF 文件。")) :
@@ -57,9 +58,17 @@ sealed class ModelPreviewForm : Form {
    if(IsDisposed||pending!=job){image.Dispose();return;}
    picture.Image=image;PreviewReady=true;
   } catch(OperationCanceledException) {if(pending!=job||IsDisposed)return;error="timeout";}
-  catch(Exception e) {if(pending!=job||IsDisposed)return;error=e is FileNotFoundException?"missing":e is InvalidDataException?"invalid":"access";}
+  catch(Exception e) {if(pending!=job||IsDisposed)return;error=e is FileNotFoundException?"missing":e is InvalidDataException?"invalid":"access";RecordError(e);}
 
   finally { if(pending==job&&!IsDisposed){pending=null;busy=false;Labels();PreviewCompleted?.Invoke(PreviewReady);}job.Dispose(); }
+ }
+ void RecordError(Exception exception) {
+  try {
+   string path=Path.Combine(Path.GetDirectoryName(languageFile),"preview-error.log");
+   Directory.CreateDirectory(Path.GetDirectoryName(path));
+   if(File.Exists(path)&&new FileInfo(path).Length>65536)File.WriteAllText(path,"");
+   File.AppendAllText(path,DateTimeOffset.Now.ToString("O")+" "+exception+Environment.NewLine);
+  }catch(IOException){}catch(UnauthorizedAccessException){}
  }
  public static async Task<Bitmap> RenderImage(string file,CancellationToken cancel) {
   file=Path.GetFullPath(file);if(!File.Exists(file))throw new FileNotFoundException();
@@ -78,9 +87,12 @@ sealed class ModelPreviewForm : Form {
    cancel.ThrowIfCancellationRequested();process.Start();
    try { await process.WaitForExitAsync(timeout.Token).ConfigureAwait(false); }
    catch { try{if(!process.HasExited)process.Kill(true);}catch(InvalidOperationException){}catch(System.ComponentModel.Win32Exception){}await process.WaitForExitAsync().ConfigureAwait(false);throw; }
-   if(process.ExitCode!=0||!File.Exists(output))throw new InvalidDataException();
+   if(process.ExitCode!=0||!File.Exists(output)){
+    string detail=File.Exists(output+".error.txt")?File.ReadAllText(output+".error.txt"):"Renderer exit code: "+process.ExitCode;
+    throw new InvalidDataException(detail);
+   }
    using var input=Image.FromFile(output);return new Bitmap(input);
-  } finally {try{File.Delete(output);}catch(IOException){}catch(UnauthorizedAccessException){}}
+  } finally {foreach(var path in new[]{output,output+".error.txt"})try{File.Delete(path);}catch(IOException){}catch(UnauthorizedAccessException){}}
  }
  public static int Snapshot(string file,string output) {
   int code=1;using var form=new ModelPreviewForm(file);

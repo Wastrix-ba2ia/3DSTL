@@ -51,3 +51,15 @@ https://learn.microsoft.com/en-us/uwp/schemas/appxpackage/uapmanifestschema/elem
 
 测试及截图在artifacts/certification-20261021；新包artifacts/3DSTL-0.2.2.0-x64.msix。中英文介绍和截图增加真实文件预览，其他测试信息更新为本轮问题根因及复测步骤。GitHub传统桌面版仍为0.1.2，没有混用商店版本号。
 2026-10-21 已重新提交0.2.2.0，后台显示正在认证，处于预处理阶段。凭证：artifacts/certification-20261021/resubmitted.png。
+
+## 2026-10-21：0.2.2.0再次被拒及0.2.3.0
+
+报告ed7733e3-4193-4a44-ac01-b718705f97ec仍为10.1.2.10，原文再次描述打开本地模型后看不到缩略图。未提供模型、截图或错误。不能确认本次审核设备上的根因，也不能把x64本机通过等同于所有设备通过。
+
+0.2.3.0将商店版开始菜单启动入口改为直接显示预览页并渲染内置sample.stl；打开模型为首个按钮，缩略图管理移到工具栏设置按钮。文件关联继续进入指定文件预览。失败时将worker异常保留在本地preview-error.log（64KiB后清理），不上传；临时worker错误文件用后清理。传统桌面版默认入口不变。
+
+真实MSIX在离线Windows11 x64 Sandbox安装测试通过：shell:AppsFolder启动显示渲染后的sample.stl标题；普通及非ASCII/空格STL关联打开通过；STL/3MF/STEP预览、33次Shell缩略图、卸载通过。独立测试覆盖损坏文件诊断和失败恢复，以及8轮语言切换。ARM64未实测。测试进程按ID57a052cc-0b3a-4cc9-8e31-4a17c15e035b停止，CLI列表为空且VM进程已退出。证据目录artifacts/certification-20261021-r3。
+
+新包3DSTL-0.2.3.0-x64.msix已上传Validated。审核说明诚实注明无法复现原始设备的问题，并请求若仍失败提供具体模型、打开路径、截图和架构；未声称已确认或彻底消除原始问题。GitHub桌面发行版本仍为0.1.3。
+
+2026-10-21：0.2.3.0已重新提交，合作伙伴中心显示正在认证（预处理阶段）。凭证artifacts/certification-20261021-r3/resubmitted.png。尚未获批准。包SHA256：57053BB19574CF5620A6CF0EDE37ADB24B41EC40338DBBFF8D2CFA20A7BDCB8D。

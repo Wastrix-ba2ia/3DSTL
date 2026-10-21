@@ -31,6 +31,8 @@ s=s.replace('Uninstall all model thumbnail handlers and restore previous associa
 s=s.replace('正在修复勾选的格式，请稍候…','正在通知 Windows 刷新，请稍候…').replace('Repairing selected formats…','Notifying Windows to refresh…')
 # The Store build has no desktop refresh queue/log. Do not expose a dead log link.
 s=s.replace('bottom.Controls.Add(logs);', '')
+# Start-menu launches show the working preview immediately; keep settings accessible.
+s=s.replace('using(var form=new ManagerForm(args.Length==0)){', 'if(args.Length==0){Application.Run(new ModelPreviewForm(Path.Combine(AppContext.BaseDirectory,"..","Samples","sample.stl"),showSettings:()=>new ManagerForm(false).Show()));return;}using(var form=new ManagerForm(args.Length==0)){')
 s=s.replace('if(args.Contains("--selftest")){SelfTest();return;}','if(args.Contains("--selftest"))return;')
 s=s.replace('if(args.Contains("--selftest-ui")){SelfTestUi();return;}','if(args.Contains("--selftest-ui"))return;')
 a=s.find(' static void SelfTestUi(){')
