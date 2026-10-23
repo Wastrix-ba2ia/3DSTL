@@ -2,11 +2,9 @@ from pathlib import Path
 from PIL import Image,ImageDraw,ImageFont
 import xml.etree.ElementTree as E,json
 root=Path(__file__).resolve().parents[1];folder=root/'artifacts/store-payload';assets=folder/'Assets';assets.mkdir(exist_ok=True)
+logo=Image.open(root/'assets/brand-logo.png').convert('RGBA')
 for size,name in [(44,'Square44.png'),(150,'Square150.png'),(50,'StoreLogo.png')]:
- image=Image.new('RGBA',(size,size),(27,41,60,255));d=ImageDraw.Draw(image);s=size/150
- d.polygon([(75*s,20*s),(128*s,48*s),(75*s,78*s),(22*s,48*s)],fill='#e4dfd0')
- d.polygon([(22*s,48*s),(75*s,78*s),(75*s,132*s),(22*s,101*s)],fill='#aaa99f')
- d.polygon([(75*s,78*s),(128*s,48*s),(128*s,101*s),(75*s,132*s)],fill='#d1cec1');image.save(assets/name)
+ logo.resize((size,size),Image.Resampling.LANCZOS).save(assets/name)
 version=(root/'store/VERSION').read_text().strip()
 identity=json.loads((root/'store/identity.json').read_text())
 formats=['3mf','stl','obj','ply','off','amf','gcode','gco','step','stp','sldprt','sldasm','slddrw','prtdot','asmdot','drwdot','eprt','easm','edrw']

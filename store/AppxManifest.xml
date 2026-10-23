@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3" xmlns:desktop2="http://schemas.microsoft.com/appx/manifest/desktop/windows10/2" xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10" xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities" IgnorableNamespaces="uap uap3 desktop2 com rescap">
-<Identity Name="Wastrix-BA2iA.3DSTL" Publisher="CN=DB7D5078-7413-402B-9151-100F6E2E73CA" ProcessorArchitecture="x64" Version="0.2.3.0"/>
+<Identity Name="Wastrix-BA2iA.3DSTL" Publisher="CN=DB7D5078-7413-402B-9151-100F6E2E73CA" ProcessorArchitecture="x64" Version="0.2.4.0"/>
 <Properties><DisplayName>3DSTL</DisplayName><PublisherDisplayName>Wastrix-BA2iA</PublisherDisplayName><Logo>Assets\StoreLogo.png</Logo><Description>Local model thumbnails for Windows File Explorer</Description></Properties>
 <Resources><Resource Language="zh-CN"/><Resource Language="en-US"/></Resources>
 <Dependencies><TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.26100.0"/></Dependencies>
