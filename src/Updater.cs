@@ -97,7 +97,7 @@ class Updater : Form {
      shortcutPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),"3DSTL.lnk");
      if (File.Exists(shortcutPath)) shortcutBackup = File.ReadAllBytes(shortcutPath);
      dynamic link = ((dynamic)shell).CreateShortcut(shortcutPath); shortcut = link;
-     link.TargetPath = manager; link.WorkingDirectory = installed; link.Save();
+     link.TargetPath = manager; link.WorkingDirectory = installed; link.IconLocation=manager+",0"; link.Save();
      shortcutHash = UpdateClient.Hash(shortcutPath);
     } finally { if(shortcut!=null)Marshal.ReleaseComObject(shortcut);if(shell!=null)Marshal.ReleaseComObject(shell); }
     // Ask the desktop shell to launch the manager independently of the updater's
