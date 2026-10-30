@@ -63,3 +63,7 @@ https://learn.microsoft.com/en-us/uwp/schemas/appxpackage/uapmanifestschema/elem
 新包3DSTL-0.2.3.0-x64.msix已上传Validated。审核说明诚实注明无法复现原始设备的问题，并请求若仍失败提供具体模型、打开路径、截图和架构；未声称已确认或彻底消除原始问题。GitHub桌面发行版本仍为0.1.3。
 
 2026-10-21：0.2.3.0已重新提交，合作伙伴中心显示正在认证（预处理阶段）。凭证artifacts/certification-20261021-r3/resubmitted.png。尚未获批准。包SHA256：57053BB19574CF5620A6CF0EDE37ADB24B41EC40338DBBFF8D2CFA20A7BDCB8D。
+
+## 2026-10-30 同步发布
+GitHub桌面版v0.1.5已发布并补齐中英文更新说明；本机完成真实下载、校验、升级。商店0.2.5.0对应Submission 3（1152921505702275719），包Validated，中英文‘此版本的新增功能’和审核备注保存后已提交认证，页面显示正在认证更新；尚未批准或发布。内容包括NAS缓存、文件夹进度/取消/强制更新。商店版仍由Store更新。凭证artifacts/store-0.2.5-submitted.png。
+
