@@ -80,10 +80,10 @@ class ThumbnailRefresh {
      // Start with the largest result so Windows can reuse it for smaller sizes.
      foreach (uint size in new uint[] { 256, 96, 48 }) {
       RefreshBitmap bitmap = null;
-      try { ((ThumbnailCache)cache).GetThumbnail(item, size, 4, out bitmap, out _, out _); }
+      try { ((ThumbnailCache)cache).GetThumbnail(item, size, size==256?4u:0x40u, out bitmap, out _, out _); }
       finally { if (bitmap != null) Marshal.ReleaseComObject(bitmap); }
      }
-     SHChangeNotify(0x2000, 0x1005, file, IntPtr.Zero);
+     SHChangeNotify(0x1000, 0x1005, Path.GetDirectoryName(file), IntPtr.Zero);
      log.WriteLine("OK " + file);
     } catch (Exception e) { failures++; log.WriteLine("FAILED " + file + " " + e.HResult.ToString("X") + " " + e.Message); }
     finally {

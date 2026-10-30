@@ -29,7 +29,7 @@ sealed class ModelPreviewForm : Form {
   language.ForeColor=Color.Black;language.BackColor=Color.White;
   foreach(var button in new[]{open,sample,settings}){button.FlatStyle=FlatStyle.Flat;button.BackColor=Color.FromArgb(38,71,94);button.ForeColor=Color.White;button.Padding=new Padding(6,2,6,2);}
   language.Items.AddRange(new object[]{"简体中文","English"});language.SelectedIndex=english?1:0;
-  toolbar.Controls.Add(open);toolbar.Controls.Add(sample);toolbar.Controls.Add(language);
+  toolbar.Controls.Add(open);toolbar.Controls.Add(sample);toolbar.Controls.Add(language);var folderButton=new Button{Text="文件夹 / Folder",AutoSize=true};folderButton.Click+=(_,_)=>new FolderPreviewForm().Show(this);toolbar.Controls.Add(folderButton);
   if(showSettings!=null){toolbar.Controls.Add(settings);settings.Click+=(_,_)=>showSettings();}
   Controls.Add(picture);Controls.Add(status);Controls.Add(toolbar);
   open.Click+=(_,_)=>{using var picker=new OpenFileDialog { Filter="3D models|"+string.Join(";",AssociationManager.Formats.Select(x=>"*."+x))+"|All files|*.*",CheckFileExists=true };if(picker.ShowDialog(this)==DialogResult.OK)_=LoadModel(picker.FileName);};
@@ -70,7 +70,7 @@ sealed class ModelPreviewForm : Form {
    File.AppendAllText(path,DateTimeOffset.Now.ToString("O")+" "+exception+Environment.NewLine);
   }catch(IOException){}catch(UnauthorizedAccessException){}
  }
- public static async Task<Bitmap> RenderImage(string file,CancellationToken cancel) {
+ public static async Task<Bitmap> RenderImage(string file,CancellationToken cancel,bool force=false) {
   file=Path.GetFullPath(file);if(!File.Exists(file))throw new FileNotFoundException();
   string ext=Path.GetExtension(file).TrimStart('.').ToLowerInvariant();
   if(!AssociationManager.Formats.Contains(ext))throw new InvalidDataException();
@@ -81,7 +81,7 @@ sealed class ModelPreviewForm : Form {
   string output=Path.Combine(Path.GetTempPath(),"3DSTL-preview-"+Guid.NewGuid().ToString("N")+".bmp");
   using var timeout=CancellationTokenSource.CreateLinkedTokenSource(cancel);timeout.CancelAfter(TimeSpan.FromMinutes(3));
   var start=new ProcessStartInfo(exe){UseShellExecute=false,CreateNoWindow=true,WorkingDirectory=Path.GetDirectoryName(exe)};
-  start.ArgumentList.Add(file);start.ArgumentList.Add(output);start.ArgumentList.Add("512");
+  start.ArgumentList.Add(file);start.ArgumentList.Add(output);start.ArgumentList.Add("512");if(force)start.ArgumentList.Add("--force");
   using var process=new Process { StartInfo=start };
   try {
    cancel.ThrowIfCancellationRequested();process.Start();
@@ -99,4 +99,34 @@ sealed class ModelPreviewForm : Form {
   form.PreviewCompleted+=ok=>{if(ok){using var bmp=new Bitmap(form.Width,form.Height);form.DrawToBitmap(bmp,new Rectangle(Point.Empty,bmp.Size));bmp.Save(output);code=0;}form.Close();};
   Application.Run(form);return code;
  }
+}
+
+sealed class FolderPreviewForm : Form {
+ readonly Button choose=new Button{Text="选择文件夹 / Choose folder",AutoSize=true},cancel=new Button{Text="取消 / Cancel",AutoSize=true,Enabled=false};
+ readonly ProgressBar bar=new ProgressBar{Dock=DockStyle.Bottom,Height=20};
+ readonly TextBox details=new TextBox{Dock=DockStyle.Fill,Multiline=true,ReadOnly=true,ScrollBars=ScrollBars.Vertical};
+ readonly Label state=new Label{Dock=DockStyle.Bottom,Height=60,Padding=new Padding(8)};
+ readonly CheckBox force=new CheckBox{Text="强制更新 / Force refresh",AutoSize=true};
+ CancellationTokenSource lifetime;bool running,closing;
+ public FolderPreviewForm(){Text="3DSTL · 文件夹预生成 / Folder previews";Width=780;Height=500;var buttons=new FlowLayoutPanel{Dock=DockStyle.Top,Height=42};buttons.Controls.Add(choose);buttons.Controls.Add(cancel);buttons.Controls.Add(force);Controls.Add(details);Controls.Add(state);Controls.Add(bar);Controls.Add(buttons);
+ choose.Click+=async(_,_)=>{using var dialog=new FolderBrowserDialog();if(dialog.ShowDialog(this)==DialogResult.OK)await Generate(dialog.SelectedPath);};cancel.Click+=(_,_)=>{lifetime?.Cancel();state.Text="正在取消当前任务… / Cancelling…";};FormClosing+=(_,e)=>{if(running){e.Cancel=true;closing=true;lifetime.Cancel();}};state.Text="只处理所选文件夹当前层级，小文件优先。任务结束后退出，不修改模型。";}
+ public async Task Generate(string folder){if(running)return;running=true;choose.Enabled=false;force.Enabled=false;cancel.Enabled=true;lifetime=new CancellationTokenSource();int done=0,failed=0;
+ try {
+  state.Text="正在读取文件列表 / Reading file list…";
+  var token=lifetime.Token;
+  var files=await Task.Run(()=>Directory.EnumerateFiles(folder).Where(p=>AssociationManager.Formats.Contains(Path.GetExtension(p).TrimStart('.').ToLowerInvariant())).Select(p=>{token.ThrowIfCancellationRequested();return new FileInfo(p);}).OrderBy(f=>f.Length).Select(f=>f.FullName).ToArray(),token);
+  bar.Maximum=Math.Max(1,files.Length);bar.Value=0;
+  foreach(var file in files){token.ThrowIfCancellationRequested();state.Text=$"读取/生成 Reading/rendering {done+1}/{files.Length}\r\n{Path.GetFileName(file)}";
+   try{using var image=await ModelPreviewForm.RenderImage(file,token,force.Checked);
+    string refresher=Path.Combine(AppContext.BaseDirectory,"refresh","3DSTL.Refresh.exe");
+    if(File.Exists(refresher)){var si=new ProcessStartInfo(refresher){UseShellExecute=false,CreateNoWindow=true};si.ArgumentList.Add(file);using var child=Process.Start(si);try{await child.WaitForExitAsync(token);}catch{try{if(!child.HasExited)child.Kill(true);}catch{}await child.WaitForExitAsync();throw;}if(child.ExitCode!=0)throw new IOException("Windows thumbnail extraction failed");}
+    details.AppendText("OK "+Path.GetFileName(file)+Environment.NewLine);
+   }catch(OperationCanceledException){throw;}catch(Exception e){failed++;details.AppendText("FAILED "+Path.GetFileName(file)+": "+e.Message+Environment.NewLine);}
+   done++;bar.Value=done;
+  }
+  NativeNotify(folder);state.Text=$"完成 Completed: {done-failed}，失败 Failed: {failed}";
+ }catch(OperationCanceledException){state.Text=$"已取消 Cancelled: {done} completed, {failed} failed";}catch(Exception e){state.Text=e.Message;}
+ finally{running=false;choose.Enabled=true;force.Enabled=true;cancel.Enabled=false;lifetime.Dispose();lifetime=null;if(closing)Close();}}
+ [System.Runtime.InteropServices.DllImport("shell32.dll",CharSet=System.Runtime.InteropServices.CharSet.Unicode)]static extern void SHChangeNotify(uint e,uint f,string path,IntPtr other);
+ static void NativeNotify(string folder)=>SHChangeNotify(0x1000,0x1005,folder,IntPtr.Zero);
 }
